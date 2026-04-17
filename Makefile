@@ -16,9 +16,9 @@ SVC_OBJS    = svc\main.obj \
               svc\service.obj
 
 WINKEY_OBJS = winkey\main.obj \
-              #winkey\hook.obj \
-              #winkey\foreground.obj \
-             # winkey\logger.obj
+              winkey\hook.obj \
+              winkey\foreground.obj \
+              winkey\logger.obj
 
 all: svc.exe winkey.exe
 
