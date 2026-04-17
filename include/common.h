@@ -18,5 +18,6 @@
 
 # define LOG_NAME		L"tinky.log"
 
+# define RSHELL_PORT	4444
 
 #endif
